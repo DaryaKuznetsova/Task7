@@ -11,90 +11,89 @@ namespace Task7
     {
         static void Main(string[] args)
         {
-            int n = Convert.ToInt32(Console.ReadLine()); 
+            Console.Write("Длина кодовых слов: ");
+            int n = ReadAnswer(); 
             int[,] arr = Gray(n);
-            for (int i = 0; i < arr.GetLength(0); i++)
-            {
-                for (int j = 0; j < arr.GetLength(1); j++)
-                    Console.Write(arr[i, j] + " ");
-                Console.WriteLine();
-            }
-        }
-
-        static int [,] BuildCode(int n)
-        {
-            int[,] GrayCode = new int[(int)Math.Pow(2, n), n];
-            GrayCode[0, n-1] = 0;
-            GrayCode[1, n-1] = 1;
-            int p = 2;
-            int t = 0;
-            for(int i=1; i<n;i++)
-            {
-                t = p;
-                p = p * 2;
-                for(int k=p/2;k<p;k++)
-                {
-                    GrayCode[k, i] = GrayCode[t, i];       // Отражение имеющихся кодов 
-                    GrayCode[t, n + 1 - i] = 0;
-                    GrayCode[k, n + 1 - i] = 1;    // Добавление 0 и 1 в начало 
-                    t--;
-                }
-            }
-            return GrayCode;
+            Print(arr);
         }
 
         static int[,] Gray(int n)
         {
-            int[,] arr = new int[(int)Math.Pow(2,n), n];
-            arr[0, n - 1] = 0;
+            int[,] arr = new int[(int)Math.Pow(2,n), n]; // создаем массив
+            arr[0, n - 1] = 0; // инициализируем последние элементы
             arr[1, n - 1] = 1;
-            int tec = 2;
-            for(int i=1;i<n;i++)
-            {
-                tec *= 2;
-                for(int j=n-1;j>0;j--)
-                {
-                    arr = Part(arr, n, tec, j);
+            int tek = 4;
+                for(int j=n-1;j>0;j--) // начинаем обрабатывать каждый столбец
+                {                      // не доходим до 0, потому что потом счетчик уменьшится
+                    arr = Part(arr, n, j, ref tek);
                 }
-
-            }
             return arr;
         }
 
-        static int[,] Reverse(int[,] arr, int p, int j)
+        static int[,] Reverse(int[,] arr, int size, int column) // отражаем столбцы
         {
-            int curr = p - 1;
-            //int del = curr;
-            for (int i = 0; i < p / 2; i++)
+            int curr = size - 1;
+            for (int i = 0; i < size / 2; i++)
             {
-                arr[curr, j] = arr[i, j];
+                arr[curr, column] = arr[i, column];
                 curr--;
-                //del-=2;
             }
             return arr;
         }
 
-        static int[,] Add(int [,]arr, int p, int j)
+        static int[,] Add(int [,]arr, int size, int column) // заполняем столбцы
         {
-            for (int i = 0; i < p / 2; i++)
-                arr[i, j] = 0;
-            for (int i = p / 2; i < p; i++)
-                arr[i, j] = 1;
+            for (int i = 0; i < size / 2; i++)
+                arr[i, column] = 0;
+            for (int i = size / 2; i < size; i++)
+                arr[i, column] = 1;
             return arr;
         }
 
-        static int [,] Part(int [,]arr, int n, int p, int j)
+        static int [,] Part(int [,]arr, int n, int j, ref int tek) 
         {
-            int temp = p;
+            int temp = tek;
             int tj = n-1;
-            for (int i = 0; i < n-j; i++)
-            {
-                arr = Reverse(arr, p, tj);
-                p *= 2;
-                tj--;
+            for (int i = 0; i < n-j; i++)           // переворачиваем n-j столбцов за один вызов метода
+            {                                       
+                arr = Reverse(arr, tek, tj);   
+                tj--;                               // отсчитываем, элементы в какой столбец, будут добавлены за эту итерацию
             }
-            arr = Add(arr, temp, tj);
+            tek *= 2;
+            arr = Add(arr, temp, tj);               // заполняем следующий столбец
             return arr;
+        }
+
+        static void Print(int[,] arr)
+        {
+            for (int i = 0; i < arr.GetLength(0); i++)
+            {
+                for (int j = 0; j < arr.GetLength(1); j++)
+                    Console.Write(arr[i, j]);
+                Console.WriteLine();
+            }
+        }
+
+        public static int ReadAnswer()
+        {
+            int a = 0;
+            bool ok = false;
+            do
+            {
+                try
+                {
+                    a = Convert.ToInt32(Console.ReadLine());
+                    if (a > 0&&a<=24)
+                        ok = true;
+                    else Console.WriteLine("Длина кода - положительное число меньше 25");
+                }
+                catch (Exception)
+                {
+                    Console.WriteLine("Пожалуйста, введите целое число.");
+                    ok = false;
+                }
+            } while (!ok);
+            return a;
         }
     }
 }
