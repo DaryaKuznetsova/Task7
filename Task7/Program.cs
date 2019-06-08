@@ -7,14 +7,63 @@ using System.IO;
 
 namespace Task7
 {
+    class Point: IComparable<Point>
+    {
+        int name;
+        string data;
+        int info;
+        
+        public Point(int n, string d)
+        {
+            name = n;
+            data = d;
+            info = Convert.ToInt32(d);
+        }
+
+        public override string ToString()
+        {
+            return $"{name,4} {data}";
+        }
+
+        public int CompareTo(Point other)
+        {
+            if (info > other.info ) return 1;
+            else
+            if (info == other.info) return 0;
+            else 
+            return -1;
+        }
+    }
     class Program
     {
         static void Main(string[] args)
         {
+            StreamWriter sw = new StreamWriter("output.txt");
             Console.Write("Длина кодовых слов: ");
             int n = ReadAnswer(); 
             int[,] arr = Gray(n);
             Print(arr);
+            RewriteGray(arr);
+            foreach (Point s in list) sw.WriteLine(s);
+            Console.WriteLine("Кодовые слова в лексикографическом порядке находятся в файле output.txt");
+            sw.Close();
+        }
+
+        static List<Point> list = new List<Point>();
+
+        static void RewriteGray(int[,] arr)
+        {
+            for(int i=0; i<arr.GetLength(0); i++)
+            {
+                string s = "";
+                for(int j=0; j<arr.GetLength(1); j++)
+                {
+                    s += arr[i, j];
+                }
+                Point p = new Point(i + 1, s);
+                list.Add(p);
+            }
+            list.Sort();
         }
 
         static int[,] Gray(int n)
@@ -57,7 +106,7 @@ namespace Task7
             for (int i = 0; i < n-j; i++)           // переворачиваем n-j столбцов за один вызов метода
             {                                       
                 arr = Reverse(arr, tek, tj);   
-                tj--;                               // отсчитываем, элементы в какой столбец, будут добавлены за эту итерацию
+                tj--;                               // отсчитываем в какой столбец будут добавлены элементы за эту итерацию
             }
             tek *= 2;
             arr = Add(arr, temp, tj);               // заполняем следующий столбец
